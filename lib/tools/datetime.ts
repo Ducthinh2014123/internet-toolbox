@@ -167,26 +167,6 @@ export function relativeTime(input: string): string {
   return rtf.format(Math.round(duration), unit);
 }
 
-export function quarterInfo(input: string): string {
-  const date = input.trim() ? new Date(input.trim()) : new Date();
-  if (Number.isNaN(date.getTime())) throw new Error("Enter a valid date.");
-  const year = date.getFullYear();
-  const month = date.getMonth();
-  const quarter = Math.floor(month / 3) + 1;
-  const startMonth = (quarter - 1) * 3;
-  const start = new Date(year, startMonth, 1);
-  const end = new Date(year, startMonth + 3, 0);
-  const fmt = (d: Date) => d.toISOString().slice(0, 10);
-  return [
-    `Date: ${fmt(date)}`,
-    `Quarter: Q${quarter} ${year}`,
-    `Quarter start: ${fmt(start)}`,
-    `Quarter end: ${fmt(end)}`,
-    `Days into quarter: ${Math.floor((date.getTime() - start.getTime()) / 86400000) + 1}`,
-    `Days remaining in quarter: ${Math.floor((end.getTime() - date.getTime()) / 86400000)}`,
-  ].join("\n");
-}
-
 export function currentTimeSnapshot(): string {
   const now = new Date();
   return [

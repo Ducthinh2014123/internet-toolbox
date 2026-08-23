@@ -189,12 +189,6 @@ export const tools: ToolDefinition[] = [
     modes: [{ id: "hash", label: "Generate SHA-512", run: (input) => enc.sha(input, "SHA-512") }],
   },
   {
-    id: "sha1-generator", name: "SHA-1 Generator", description: "Compute the SHA-1 hash of text using Web Crypto",
-    category: "encoding", icon: Hash, keywords: ["sha1", "hash", "sha-1"],
-    componentType: "text-io", placeholder: "Hello", sample: "Hello, world!",
-    modes: [{ id: "hash", label: "Generate SHA-1", run: (input) => enc.sha(input, "SHA-1") }],
-  },
-  {
     id: "md5-generator", name: "MD5 Generator", description: "Compute the MD5 hash of text",
     category: "encoding", icon: Hash, keywords: ["md5", "hash"],
     componentType: "text-io", placeholder: "Hello", sample: "Hello, world!",
@@ -247,12 +241,6 @@ export const tools: ToolDefinition[] = [
     category: "encoding", icon: Binary, keywords: ["binary", "encode", "decode"],
     componentType: "text-io", placeholder: "Hello", sample: "Hello",
     modes: [{ id: "encode", label: "Encode", run: enc.binaryEncode }, { id: "decode", label: "Decode", run: enc.binaryDecode }],
-  },
-  {
-    id: "base32-encoder", name: "Base32 Encoder / Decoder", description: "Convert text to and from Base32 (RFC 4648)",
-    category: "encoding", icon: Binary, keywords: ["base32", "encode", "decode", "rfc4648"],
-    componentType: "text-io", placeholder: "Hello", sample: "Hello, world!",
-    modes: [{ id: "encode", label: "Encode", run: enc.base32Encode }, { id: "decode", label: "Decode", run: enc.base32Decode }],
   },
 
   // ---------------- Text ----------------
@@ -338,12 +326,6 @@ export const tools: ToolDefinition[] = [
       { type: "textarea", id: "b", label: "Text B", rows: 8, defaultValue: "Hello there world" },
     ],
     run: (v) => txt.diffLines(String(v.a), String(v.b)),
-  },
-  {
-    id: "readability-score", name: "Text Readability Score", description: "Estimate Flesch Reading Ease and Flesch-Kincaid grade level",
-    category: "text", icon: ScrollText, keywords: ["readability", "flesch", "grade level", "reading ease"],
-    componentType: "text-io", placeholder: "Paste a paragraph...", sample: "The quick brown fox jumps over the lazy dog. This sentence is often used to test typefaces and keyboards.",
-    modes: [{ id: "analyze", label: "Analyze", run: txt.readabilityScore }],
   },
   {
     id: "slug-generator", name: "Slug Generator", description: "Turn text into a URL-friendly slug",
@@ -485,13 +467,6 @@ export const tools: ToolDefinition[] = [
     componentType: "form",
     fields: [{ type: "number", id: "year", label: "Year", defaultValue: 2026 }],
     run: (v) => { try { return dt.leapYearCheck(String(v.year)); } catch (e) { return { error: (e as Error).message }; } },
-  },
-  {
-    id: "quarter-calculator", name: "Fiscal Quarter Calculator", description: "Find the calendar quarter, start and end dates for any date",
-    category: "datetime", icon: CalendarRange, keywords: ["quarter", "fiscal", "q1", "q2", "q3", "q4"],
-    componentType: "form",
-    fields: [{ type: "date", id: "date", label: "Date", defaultValue: "" }],
-    run: (v) => { try { return dt.quarterInfo(String(v.date || "")); } catch (e) { return { error: (e as Error).message }; } },
   },
   {
     id: "cron-helper", name: "Cron Expression Helper", description: "Explain a 5-field cron expression in plain English",
@@ -651,20 +626,6 @@ export const tools: ToolDefinition[] = [
     run: (v) => web.generateRobotsTxt({ allowAll: Boolean(v.allowAll), disallowPaths: String(v.disallowPaths), sitemapUrl: String(v.sitemapUrl) }),
   },
   {
-    id: "utm-link-builder", name: "UTM Link Builder", description: "Build a shareable URL with UTM campaign tracking parameters",
-    category: "web", icon: LinkIcon, keywords: ["utm", "campaign", "link", "tracking", "marketing"], popular: true,
-    componentType: "form",
-    fields: [
-      { type: "text", id: "baseUrl", label: "Destination URL", defaultValue: "https://example.com/landing" },
-      { type: "text", id: "source", label: "utm_source", defaultValue: "newsletter" },
-      { type: "text", id: "medium", label: "utm_medium", defaultValue: "email" },
-      { type: "text", id: "campaign", label: "utm_campaign", defaultValue: "spring_sale" },
-      { type: "text", id: "term", label: "utm_term (optional)", defaultValue: "" },
-      { type: "text", id: "content", label: "utm_content (optional)", defaultValue: "" },
-    ],
-    run: (v) => { try { return web.buildUtmLink({ baseUrl: String(v.baseUrl), source: String(v.source), medium: String(v.medium), campaign: String(v.campaign), term: String(v.term || ""), content: String(v.content || "") }); } catch (e) { return { error: (e as Error).message }; } },
-  },
-  {
     id: "browser-info", name: "Browser Information", description: "Show information about your current browser",
     category: "web", icon: Cpu, keywords: ["browser", "information", "navigator", "user agent"],
     componentType: "form", fields: [],
@@ -785,17 +746,6 @@ export const tools: ToolDefinition[] = [
       ] },
     ],
     run: (v) => net.networkByteCalculator({ amount: Number(v.amount) || 0, fromUnit: String(v.fromUnit) }),
-  },
-  {
-    id: "random-ip-generator", name: "Random IP Address Generator", description: "Generate random IPv4 or IPv6 addresses for testing",
-    category: "network", icon: Shuffle, keywords: ["random", "ip", "ipv4", "ipv6", "generator", "test data"],
-    componentType: "form",
-    fields: [
-      { type: "select", id: "version", label: "IP version", defaultValue: "v4", options: [{ label: "IPv4", value: "v4" }, { label: "IPv6", value: "v6" }] },
-      { type: "select", id: "type", label: "Address type (IPv4 only)", defaultValue: "public", options: [{ label: "Public-looking", value: "public" }, { label: "Private (RFC1918)", value: "private" }] },
-      { type: "number", id: "count", label: "How many", defaultValue: 5, min: 1, max: 50 },
-    ],
-    run: (v) => net.randomIpGenerator({ version: String(v.version), type: String(v.type), count: Number(v.count) || 5 }),
   },
   {
     id: "dns-record-formatter", name: "DNS Record Formatter", description: "Format a DNS record into zone-file style text",
@@ -991,18 +941,6 @@ export const tools: ToolDefinition[] = [
     fields: [{ type: "select", id: "style", label: "Style", defaultValue: "modern", options: [{ label: "Modern", value: "modern" }, { label: "Minimal", value: "minimal" }] }],
     downloadExt: "css", downloadMime: "text/css",
     run: (v) => gen.generateCssReset(String(v.style)),
-  },
-  {
-    id: "color-palette-generator", name: "Random Color Palette Generator", description: "Generate a random set of harmonious hex colors",
-    category: "generators", icon: Palette, keywords: ["color", "palette", "hex", "design", "generator"], popular: true,
-    componentType: "form",
-    fields: [
-      { type: "number", id: "count", label: "Number of colors", defaultValue: 5, min: 2, max: 20 },
-      { type: "select", id: "mode", label: "Palette style", defaultValue: "random", options: [
-        { label: "Random", value: "random" }, { label: "Monochrome", value: "monochrome" }, { label: "Analogous", value: "analogous" },
-      ] },
-    ],
-    run: (v) => gen.generateColorPalette({ count: Number(v.count) || 5, mode: String(v.mode) }),
   },
   {
     id: "random-data-generator", name: "Random Data Generator", description: "Generate random sample data rows as JSON or CSV",

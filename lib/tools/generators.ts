@@ -198,47 +198,6 @@ function randomItem<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function hslToHexLocal(h: number, s: number, l: number): string {
-  const c = (1 - Math.abs(2 * l - 1)) * s;
-  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-  const m = l - c / 2;
-  let r = 0, g = 0, b = 0;
-  if (h < 60) [r, g, b] = [c, x, 0];
-  else if (h < 120) [r, g, b] = [x, c, 0];
-  else if (h < 180) [r, g, b] = [0, c, x];
-  else if (h < 240) [r, g, b] = [0, x, c];
-  else if (h < 300) [r, g, b] = [x, 0, c];
-  else [r, g, b] = [c, 0, x];
-  const toHex = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, "0");
-  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-}
-
-export function generateColorPalette(values: { count: number; mode: string }): string {
-  const count = Math.max(2, Math.min(values.count || 5, 20));
-  const baseHue = Math.floor(Math.random() * 360);
-  const colors: string[] = [];
-  for (let i = 0; i < count; i++) {
-    let hue: number;
-    let sat: number;
-    let light: number;
-    if (values.mode === "monochrome") {
-      hue = baseHue;
-      sat = 0.55;
-      light = 0.2 + (i / (count - 1)) * 0.6;
-    } else if (values.mode === "analogous") {
-      hue = (baseHue + i * 20) % 360;
-      sat = 0.55 + Math.random() * 0.2;
-      light = 0.4 + Math.random() * 0.2;
-    } else {
-      hue = (baseHue + i * (360 / count)) % 360;
-      sat = 0.5 + Math.random() * 0.3;
-      light = 0.4 + Math.random() * 0.25;
-    }
-    colors.push(hslToHexLocal(hue, sat, light));
-  }
-  return colors.join("\n");
-}
-
 export function generateRandomData(values: { count: number; fields: string[]; format: string }): string {
   const count = Math.max(1, Math.min(values.count || 5, 500));
   const rows = Array.from({ length: count }, (_, i) => {

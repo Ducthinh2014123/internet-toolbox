@@ -69,7 +69,7 @@ export function decodeJwt(token: string): string {
 }
 
 export function generateUuidV4(): string {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") return crypto.randomUUID();
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
   bytes[6] = (bytes[6] & 0x0f) | 0x40;
@@ -78,7 +78,7 @@ export function generateUuidV4(): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
-export async function sha(input: string, algo: "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512"): Promise<string> {
+export async function sha(input: string, algo: "SHA-256" | "SHA-384" | "SHA-512"): Promise<string> {
   const data = new TextEncoder().encode(input);
   const digest = await crypto.subtle.digest(algo, data);
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
@@ -231,36 +231,5 @@ export function binaryDecode(input: string): string {
     if (!/^[01]{1,8}$/.test(g)) throw new Error(`Invalid binary byte: "${g}"`);
     bytes[i] = parseInt(g, 2);
   });
-  return new TextDecoder().decode(bytes);
-}
-
-const BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-
-export function base32Encode(input: string): string {
-  const bytes = new TextEncoder().encode(input);
-  let bits = "";
-  let output = "";
-  for (const byte of bytes) bits += byte.toString(2).padStart(8, "0");
-  for (let i = 0; i < bits.length; i += 5) {
-    const chunk = bits.slice(i, i + 5).padEnd(5, "0");
-    output += BASE32_ALPHABET[parseInt(chunk, 2)];
-  }
-  while (output.length % 8 !== 0) output += "=";
-  return output;
-}
-
-export function base32Decode(input: string): string {
-  const clean = input.trim().toUpperCase().replace(/=+$/, "");
-  if (!/^[A-Z2-7]*$/.test(clean)) throw new Error("Input contains characters outside the Base32 alphabet (A-Z, 2-7).");
-  let bits = "";
-  for (const ch of clean) {
-    const value = BASE32_ALPHABET.indexOf(ch);
-    bits += value.toString(2).padStart(5, "0");
-  }
-  const byteCount = Math.floor(bits.length / 8);
-  const bytes = new Uint8Array(byteCount);
-  for (let i = 0; i < byteCount; i++) {
-    bytes[i] = parseInt(bits.slice(i * 8, i * 8 + 8), 2);
-  }
   return new TextDecoder().decode(bytes);
 }

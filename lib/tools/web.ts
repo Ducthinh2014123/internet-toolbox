@@ -238,30 +238,6 @@ export function generateRobotsTxt(values: { allowAll: boolean; disallowPaths: st
   return lines.join("\n");
 }
 
-export function buildUtmLink(values: {
-  baseUrl: string;
-  source: string;
-  medium: string;
-  campaign: string;
-  term?: string;
-  content?: string;
-}): string {
-  const base = values.baseUrl.trim();
-  if (!base) throw new Error("Enter a destination URL.");
-  let url: URL;
-  try {
-    url = new URL(base);
-  } catch {
-    throw new Error("Enter a valid absolute URL, e.g. https://example.com/page");
-  }
-  if (values.source.trim()) url.searchParams.set("utm_source", values.source.trim());
-  if (values.medium.trim()) url.searchParams.set("utm_medium", values.medium.trim());
-  if (values.campaign.trim()) url.searchParams.set("utm_campaign", values.campaign.trim());
-  if (values.term?.trim()) url.searchParams.set("utm_term", values.term.trim());
-  if (values.content?.trim()) url.searchParams.set("utm_content", values.content.trim());
-  return url.toString();
-}
-
 export function browserInfoSnapshot(): string {
   if (typeof navigator === "undefined") throw new Error("Browser information is only available in the browser");
   const nav = navigator as Navigator & { userAgentData?: { platform?: string } };

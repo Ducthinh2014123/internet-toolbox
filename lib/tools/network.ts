@@ -221,39 +221,6 @@ export function networkByteCalculator(values: { amount: number; fromUnit: string
   ].join("\n");
 }
 
-function randomHex(digits: number): string {
-  let out = "";
-  for (let i = 0; i < digits; i++) out += Math.floor(Math.random() * 16).toString(16);
-  return out;
-}
-
-export function randomIpGenerator(values: { version: string; type: string; count: number }): string {
-  const count = Math.max(1, Math.min(values.count || 1, 50));
-  const ips: string[] = [];
-  for (let i = 0; i < count; i++) {
-    if (values.version === "v6") {
-      const groups = Array.from({ length: 8 }, () => randomHex(4));
-      ips.push(groups.join(":"));
-    } else if (values.type === "private") {
-      const ranges = [
-        () => `10.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}.${1 + Math.floor(Math.random() * 254)}`,
-        () => `172.${16 + Math.floor(Math.random() * 16)}.${Math.floor(Math.random() * 256)}.${1 + Math.floor(Math.random() * 254)}`,
-        () => `192.168.${Math.floor(Math.random() * 256)}.${1 + Math.floor(Math.random() * 254)}`,
-      ];
-      ips.push(ranges[Math.floor(Math.random() * ranges.length)]());
-    } else {
-      // Public-looking IPv4: avoid the reserved 0/10/100/127/169/172/192/224+ leading octets.
-      const reserved = new Set([0, 10, 100, 127, 169, 172, 192, 224, 240, 255]);
-      let first = 0;
-      do {
-        first = 1 + Math.floor(Math.random() * 254);
-      } while (reserved.has(first));
-      ips.push(`${first}.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}.${1 + Math.floor(Math.random() * 254)}`);
-    }
-  }
-  return ips.join("\n");
-}
-
 export function formatDnsRecord(values: { name: string; type: string; ttl: number; value: string; priority?: number }): string {
   const ttl = values.ttl || 3600;
   if (values.type === "MX") {
