@@ -25,7 +25,7 @@ export function Footer() {
               <li><Link href="/about" className="hover:text-foreground">About</Link></li>
               <li><Link href="/privacy" className="hover:text-foreground">Privacy</Link></li>
               <li>
-                <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-foreground">
+                <a href="https://github.com/Ducthinh2014123/internet-toolbox" target="_blank" rel="noreferrer" className="hover:text-foreground">
                   GitHub
                 </a>
               </li>

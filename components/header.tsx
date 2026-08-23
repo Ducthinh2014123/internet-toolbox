@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Search, Wrench } from "lucide-react";
+import { Search, Wrench, Github } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { CommandPalette } from "@/components/command-palette";
 
@@ -62,6 +62,15 @@ export function Header() {
                 Ctrl K
               </kbd>
             </button>
+            <a
+              href="https://github.com/Ducthinh2014123/internet-toolbox"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="View on GitHub"
+              className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-transparent text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              <Github className="h-4 w-4" />
+            </a>
             <ThemeToggle />
           </div>
         </div>
