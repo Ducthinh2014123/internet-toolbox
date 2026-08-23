@@ -183,3 +183,42 @@ export function diffLines(a: string, b: string): string {
   while (j < m) out.push(`+ ${bLines[j++]}`);
   return out.join("\n");
 }
+
+function countSyllables(word: string): number {
+  const w = word.toLowerCase().replace(/[^a-z]/g, "");
+  if (!w) return 0;
+  const matches = w.match(/[aeiouy]+/g);
+  let count = matches ? matches.length : 0;
+  if (w.endsWith("e") && count > 1) count--;
+  return Math.max(1, count);
+}
+
+export function readabilityScore(input: string): string {
+  const words = input.trim().match(/[A-Za-z']+/g) ?? [];
+  const sentences = input.split(/[.!?]+(?:\s|$)/).map((s) => s.trim()).filter(Boolean);
+  const wordCount = words.length || 1;
+  const sentenceCount = sentences.length || 1;
+  const syllableCount = words.reduce((sum, w) => sum + countSyllables(w), 0);
+
+  const fleschScore = 206.835 - 1.015 * (wordCount / sentenceCount) - 84.6 * (syllableCount / wordCount);
+  const clamped = Math.max(0, Math.min(100, fleschScore));
+
+  let level: string;
+  if (clamped >= 90) level = "Very easy (5th grade)";
+  else if (clamped >= 80) level = "Easy (6th grade)";
+  else if (clamped >= 70) level = "Fairly easy (7th grade)";
+  else if (clamped >= 60) level = "Standard (8th\u20139th grade)";
+  else if (clamped >= 50) level = "Fairly difficult (10th\u201312th grade)";
+  else if (clamped >= 30) level = "Difficult (college)";
+  else level = "Very difficult (college graduate)";
+
+  return [
+    `Flesch Reading Ease: ${clamped.toFixed(1)}`,
+    `Reading level: ${level}`,
+    `Words: ${wordCount}`,
+    `Sentences: ${sentenceCount}`,
+    `Syllables: ${syllableCount}`,
+    `Avg words/sentence: ${(wordCount / sentenceCount).toFixed(1)}`,
+    `Avg syllables/word: ${(syllableCount / wordCount).toFixed(2)}`,
+  ].join("\n");
+}

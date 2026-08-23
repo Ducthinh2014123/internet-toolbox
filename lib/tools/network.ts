@@ -228,3 +228,28 @@ export function formatDnsRecord(values: { name: string; type: string; ttl: numbe
   }
   return `${values.name}.\t${ttl}\tIN\t${values.type}\t${values.value}`;
 }
+
+function randomInt(min: number, max: number): number {
+  const range = max - min + 1;
+  const bytes = new Uint32Array(1);
+  crypto.getRandomValues(bytes);
+  return min + (bytes[0] % range);
+}
+
+export function randomIpGenerator(values: { count: number; type: string }): string {
+  const count = Math.max(1, Math.min(values.count || 1, 100));
+  const results: string[] = [];
+  for (let i = 0; i < count; i++) {
+    if (values.type === "private") {
+      const ranges = [
+        () => `10.${randomInt(0, 255)}.${randomInt(0, 255)}.${randomInt(1, 254)}`,
+        () => `172.${randomInt(16, 31)}.${randomInt(0, 255)}.${randomInt(1, 254)}`,
+        () => `192.168.${randomInt(0, 255)}.${randomInt(1, 254)}`,
+      ];
+      results.push(ranges[randomInt(0, ranges.length - 1)]());
+    } else {
+      results.push(`${randomInt(1, 255)}.${randomInt(0, 255)}.${randomInt(0, 255)}.${randomInt(1, 254)}`);
+    }
+  }
+  return results.join("\n");
+}

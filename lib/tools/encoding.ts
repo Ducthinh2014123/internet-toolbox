@@ -78,7 +78,7 @@ export function generateUuidV4(): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
-export async function sha(input: string, algo: "SHA-256" | "SHA-384" | "SHA-512"): Promise<string> {
+export async function sha(input: string, algo: "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512"): Promise<string> {
   const data = new TextEncoder().encode(input);
   const digest = await crypto.subtle.digest(algo, data);
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
@@ -231,5 +231,37 @@ export function binaryDecode(input: string): string {
     if (!/^[01]{1,8}$/.test(g)) throw new Error(`Invalid binary byte: "${g}"`);
     bytes[i] = parseInt(g, 2);
   });
+  return new TextDecoder().decode(bytes);
+}
+
+const BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+export function base32Encode(input: string): string {
+  const bytes = new TextEncoder().encode(input);
+  let bits = "";
+  bytes.forEach((b) => (bits += b.toString(2).padStart(8, "0")));
+  let output = "";
+  for (let i = 0; i < bits.length; i += 5) {
+    let chunk = bits.slice(i, i + 5);
+    if (chunk.length < 5) chunk = chunk.padEnd(5, "0");
+    output += BASE32_ALPHABET[parseInt(chunk, 2)];
+  }
+  while (output.length % 8 !== 0) output += "=";
+  return output;
+}
+
+export function base32Decode(input: string): string {
+  const clean = input.trim().toUpperCase().replace(/=+$/, "");
+  let bits = "";
+  for (const char of clean) {
+    const idx = BASE32_ALPHABET.indexOf(char);
+    if (idx === -1) throw new Error(`Invalid Base32 character: "${char}"`);
+    bits += idx.toString(2).padStart(5, "0");
+  }
+  const byteCount = Math.floor(bits.length / 8);
+  const bytes = new Uint8Array(byteCount);
+  for (let i = 0; i < byteCount; i++) {
+    bytes[i] = parseInt(bits.slice(i * 8, i * 8 + 8), 2);
+  }
   return new TextDecoder().decode(bytes);
 }

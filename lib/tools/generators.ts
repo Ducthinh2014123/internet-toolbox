@@ -219,3 +219,52 @@ export function generateRandomData(values: { count: number; fields: string[]; fo
   }
   return JSON.stringify(rows, null, 2);
 }
+
+function hslToHexLocal(h: number, s: number, l: number): string {
+  const sNorm = s / 100;
+  const lNorm = l / 100;
+  const k = (n: number) => (n + h / 30) % 12;
+  const a = sNorm * Math.min(lNorm, 1 - lNorm);
+  const f = (n: number) => lNorm - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  const toHex = (x: number) => Math.round(x * 255).toString(16).padStart(2, "0");
+  return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`;
+}
+
+export function generateColorPalette(values: { baseColor: string; scheme: string }): string {
+  const hex = values.baseColor.trim().replace(/^#/, "");
+  if (!/^[0-9a-fA-F]{6}$/.test(hex)) throw new Error("Enter a valid hex color, e.g. #3b82f6");
+  const r = parseInt(hex.slice(0, 2), 16) / 255;
+  const g = parseInt(hex.slice(2, 4), 16) / 255;
+  const b = parseInt(hex.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  const l = (max + min) / 2;
+  const d = max - min;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  if (d !== 0) {
+    if (max === r) h = ((g - b) / d) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+  }
+  h = Math.round(h * 60);
+  if (h < 0) h += 360;
+  const sPct = Math.round(s * 100);
+  const lPct = Math.round(l * 100);
+
+  let hues: number[];
+  switch (values.scheme) {
+    case "complementary":
+      hues = [h, (h + 180) % 360];
+      break;
+    case "analogous":
+      hues = [h, (h + 30) % 360, (h + 330) % 360];
+      break;
+    case "triadic":
+      hues = [h, (h + 120) % 360, (h + 240) % 360];
+      break;
+    default:
+      hues = [h, (h + 60) % 360, (h + 180) % 360, (h + 240) % 360, (h + 300) % 360];
+  }
+  return hues.map((hue) => hslToHexLocal(hue, sPct, lPct)).join("\n");
+}

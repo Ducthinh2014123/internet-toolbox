@@ -242,6 +242,18 @@ export const tools: ToolDefinition[] = [
     componentType: "text-io", placeholder: "Hello", sample: "Hello",
     modes: [{ id: "encode", label: "Encode", run: enc.binaryEncode }, { id: "decode", label: "Decode", run: enc.binaryDecode }],
   },
+  {
+    id: "sha1-generator", name: "SHA-1 Generator", description: "Compute the SHA-1 hash of text using Web Crypto",
+    category: "encoding", icon: Hash, keywords: ["sha1", "hash", "sha-1"],
+    componentType: "text-io", placeholder: "Hello", sample: "Hello, world!",
+    modes: [{ id: "hash", label: "Generate SHA-1", run: (input) => enc.sha(input, "SHA-1") }],
+  },
+  {
+    id: "base32-encoder", name: "Base32 Encoder / Decoder", description: "Encode or decode text using Base32 (RFC 4648)",
+    category: "encoding", icon: Binary, keywords: ["base32", "encode", "decode"],
+    componentType: "text-io", placeholder: "Hello", sample: "Hello, world!",
+    modes: [{ id: "encode", label: "Encode", run: enc.base32Encode }, { id: "decode", label: "Decode", run: enc.base32Decode }],
+  },
 
   // ---------------- Text ----------------
   {
@@ -380,6 +392,12 @@ export const tools: ToolDefinition[] = [
     componentType: "text-io", placeholder: "a\nb\nc", sample: "first line\nsecond line\nthird line",
     modes: [{ id: "number", label: "Add line numbers", run: txt.addLineNumbers }],
   },
+  {
+    id: "readability-score", name: "Readability Score", description: "Estimate the Flesch Reading Ease score of a text",
+    category: "text", icon: FileTextIcon, keywords: ["readability", "flesch", "reading", "score"],
+    componentType: "text-io", placeholder: "Type or paste text...", sample: "The quick brown fox jumps over the lazy dog. It was a bright, sunny day.",
+    modes: [{ id: "score", label: "Calculate", run: txt.readabilityScore }],
+  },
 
   // ---------------- Date & Time ----------------
   {
@@ -486,6 +504,13 @@ export const tools: ToolDefinition[] = [
     id: "current-time", name: "Current Time Generator", description: "Show the current time in multiple formats",
     category: "datetime", icon: Watch, keywords: ["current", "time", "now"],
     componentType: "form", fields: [], run: () => dt.currentTimeSnapshot(),
+  },
+  {
+    id: "quarter-calculator", name: "Quarter Calculator", description: "Find the fiscal quarter and date range for any date",
+    category: "datetime", icon: CalendarRange, keywords: ["quarter", "fiscal", "q1", "q2", "q3", "q4"],
+    componentType: "form",
+    fields: [{ type: "date", id: "date", label: "Date", defaultValue: "2026-08-23" }],
+    run: (v) => { try { return dt.quarterInfo(String(v.date)); } catch (e) { return { error: (e as Error).message }; } },
   },
 
   // ---------------- Developer & Code (additional formatters) ----------------
@@ -631,6 +656,29 @@ export const tools: ToolDefinition[] = [
     componentType: "form", fields: [],
     run: () => { try { return web.browserInfoSnapshot(); } catch (e) { return { error: (e as Error).message }; } },
   },
+  {
+    id: "utm-link-builder", name: "UTM Link Builder", description: "Build a URL with UTM campaign tracking parameters",
+    category: "web", icon: LinkIcon, keywords: ["utm", "campaign", "tracking", "link", "marketing"], popular: true,
+    componentType: "form",
+    fields: [
+      { type: "text", id: "baseUrl", label: "Base URL", defaultValue: "https://example.com/landing" },
+      { type: "text", id: "source", label: "Source (utm_source)", defaultValue: "newsletter" },
+      { type: "text", id: "medium", label: "Medium (utm_medium)", defaultValue: "email" },
+      { type: "text", id: "campaign", label: "Campaign (utm_campaign)", defaultValue: "summer-sale" },
+      { type: "text", id: "term", label: "Term (utm_term, optional)", defaultValue: "" },
+      { type: "text", id: "content", label: "Content (utm_content, optional)", defaultValue: "" },
+    ],
+    run: (v) => {
+      try {
+        return web.buildUtmLink({
+          baseUrl: String(v.baseUrl), source: String(v.source), medium: String(v.medium),
+          campaign: String(v.campaign), term: String(v.term || ""), content: String(v.content || ""),
+        });
+      } catch (e) {
+        return { error: e instanceof Error ? e.message : "Enter a valid base URL" };
+      }
+    },
+  },
 
   // ---------------- Network & IP ----------------
   {
@@ -761,6 +809,18 @@ export const tools: ToolDefinition[] = [
       { type: "number", id: "priority", label: "Priority (MX only)", defaultValue: 10 },
     ],
     run: (v) => net.formatDnsRecord({ name: String(v.name), type: String(v.type), ttl: Number(v.ttl) || 3600, value: String(v.value), priority: Number(v.priority) || 10 }),
+  },
+  {
+    id: "random-ip-generator", name: "Random IP Generator", description: "Generate random IPv4 addresses, public or private",
+    category: "network", icon: Network, keywords: ["random", "ip", "generator", "ipv4"],
+    componentType: "form",
+    fields: [
+      { type: "number", id: "count", label: "How many", defaultValue: 5, min: 1, max: 100 },
+      { type: "select", id: "type", label: "Type", defaultValue: "any", options: [
+        { label: "Any", value: "any" }, { label: "Private range", value: "private" },
+      ] },
+    ],
+    run: (v) => net.randomIpGenerator({ count: Number(v.count) || 5, type: String(v.type) }),
   },
 
   // ---------------- Generators ----------------
@@ -959,6 +1019,25 @@ export const tools: ToolDefinition[] = [
       count: Number(v.count) || 10, format: String(v.format),
       fields: ["id", "name", "email", "age", "phone"].filter((f) => Boolean(v[f])),
     }),
+  },
+  {
+    id: "color-palette-generator", name: "Color Palette Generator", description: "Generate a matching color palette from a base color",
+    category: "generators", icon: Palette, keywords: ["color", "palette", "generator", "design", "hsl"], popular: true,
+    componentType: "form",
+    fields: [
+      { type: "color", id: "baseColor", label: "Base color", defaultValue: "#3b82f6" },
+      { type: "select", id: "scheme", label: "Scheme", defaultValue: "analogous", options: [
+        { label: "Analogous", value: "analogous" }, { label: "Complementary", value: "complementary" },
+        { label: "Triadic", value: "triadic" }, { label: "Shades", value: "shades" },
+      ] },
+    ],
+    run: (v) => {
+      try {
+        return gen.generateColorPalette({ baseColor: String(v.baseColor), scheme: String(v.scheme) });
+      } catch (e) {
+        return { error: e instanceof Error ? e.message : "Enter a valid hex color" };
+      }
+    },
   },
 
   // ---------------- Subtitle & Data ----------------
