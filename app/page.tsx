@@ -31,7 +31,7 @@ export default function HomePage() {
               aria-label="Search tools"
             />
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">{tools.length} tools available now \u00b7 growing every checkpoint</p>
+          <p className="mt-3 text-xs text-muted-foreground">{tools.length} tools available now · growing every checkpoint</p>
         </div>
       </section>
 
