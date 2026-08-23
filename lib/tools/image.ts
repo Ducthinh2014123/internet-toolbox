@@ -356,7 +356,6 @@ export async function applyImageFilter(values: Record<string, unknown>): Promise
       contrast: `contrast(${amount}%)`,
       saturate: `saturate(${amount}%)`,
     };
-    // @ts-expect-error -- ctx.filter is supported by all evergreen browsers.
     ctx.filter = filterMap[filter] ?? "none";
     ctx.drawImage(img, 0, 0);
     return canvasToDataUrl(canvas, String(values.format ?? "png"));
