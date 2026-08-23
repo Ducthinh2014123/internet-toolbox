@@ -44,7 +44,7 @@ export default function HomePage() {
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {(query ? filtered : popular).map((tool) => (
-            <ToolCard key={tool.id} tool={tool} />
+            <ToolCard key={tool.id} toolId={tool.id} />
           ))}
         </div>
       </section>
@@ -81,7 +81,7 @@ export default function HomePage() {
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {tools.slice(0, 12).map((tool) => (
-            <ToolCard key={tool.id} tool={tool} />
+            <ToolCard key={tool.id} toolId={tool.id} />
           ))}
         </div>
       </section>

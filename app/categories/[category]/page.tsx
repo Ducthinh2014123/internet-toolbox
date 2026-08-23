@@ -35,7 +35,7 @@ export default function CategoryPage({ params }: Props) {
 
       <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {categoryTools.map((tool) => (
-          <ToolCard key={tool.id} tool={tool} />
+          <ToolCard key={tool.id} toolId={tool.id} />
         ))}
         {categoryTools.length === 0 && (
           <p className="col-span-full py-12 text-center text-sm text-muted-foreground">

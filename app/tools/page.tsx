@@ -48,7 +48,7 @@ export default function AllToolsPage() {
 
       <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {results.map((tool) => (
-          <ToolCard key={tool.id} tool={tool} />
+          <ToolCard key={tool.id} toolId={tool.id} />
         ))}
         {results.length === 0 && <p className="col-span-full py-12 text-center text-sm text-muted-foreground">No tools match your search.</p>}
       </div>

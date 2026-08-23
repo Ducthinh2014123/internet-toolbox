@@ -2,14 +2,22 @@
 
 import Link from "next/link";
 import { Star } from "lucide-react";
-import type { ToolDefinition } from "@/lib/types";
+import { getToolById } from "@/lib/tools-registry";
 import { getCategory } from "@/lib/categories";
 import { useFavorites } from "@/lib/hooks/use-local-storage-list";
 import { cn } from "@/lib/utils";
 
-export function ToolCard({ tool }: { tool: ToolDefinition }) {
-  const Icon = tool.icon;
+// Accepts only a serializable tool id and looks the full tool definition
+// (including its icon component and functions) up from the registry itself.
+// This avoids passing functions/components across the Server -> Client
+// Component boundary, which Next.js disallows.
+export function ToolCard({ toolId }: { toolId: string }) {
+  const tool = getToolById(toolId);
   const { isFavorite, toggleFavorite } = useFavorites();
+
+  if (!tool) return null;
+
+  const Icon = tool.icon;
   const favorite = isFavorite(tool.id);
 
   return (
